@@ -1,1 +1,3 @@
-# reto_TC2008B
+# Movilidad Urbana - TC2008B
+## Fernanda Cantú Ortega A01782232 & Alina Rosas Macedo A01252720
+La movilidad urbana tiene un impacto en la economía de un país. En México, el impacto ha sido negativo. El reto consiste en un proponer una solución para reducir la congestión vehicular. Utilizando Unity y la librería 'flask' de Python, el objetivo es realizar una simulación de tráfico. Esto se logrará mediante modelación de agentes, modelación gráfica en tres dimensiones, interacción entre agentes, y animación gráfica en tres dimensiones.

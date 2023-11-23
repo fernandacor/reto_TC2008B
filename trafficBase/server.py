@@ -2,6 +2,7 @@ from agent import *
 from model import CityModel
 from mesa.visualization import CanvasGrid, BarChartModule
 from mesa.visualization import ModularServer
+import random
 
 def agent_portrayal(agent):
     if agent is None: return
@@ -34,6 +35,7 @@ def agent_portrayal(agent):
         portrayal["h"] = 0.8
     
     if(isinstance(agent, Car)):
+        # portrayal["Color"] = random.choice(["blue", "yellow", "purple", "pink", "orange"])
         portrayal["Color"] = "black"
         portrayal["Layer"] = 2
         portrayal["w"] = 0.8
@@ -44,7 +46,7 @@ def agent_portrayal(agent):
 width = 0
 height = 0
 
-with open('city_files/mod2022_base.txt') as baseFile:
+with open('city_files/2022_base.txt') as baseFile:
     lines = baseFile.readlines()
     width = len(lines[0])-1
     height = len(lines)

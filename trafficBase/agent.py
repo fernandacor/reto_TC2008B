@@ -17,6 +17,10 @@ class Car(Agent):
         super().__init__(unique_id, model)
         self.direction = "Right" # default
         self.destination = None
+        
+        # self.destination = destination;
+        # self.path = None
+        
 
     def move(self):
         """ 

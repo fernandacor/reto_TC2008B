@@ -6,12 +6,6 @@ import random
 import json
 
 class CityModel(Model):
-    """ 
-        Creates a model based on a city map.
-
-        Args:
-            N: Number of agents in the simulation
-    """
     def __init__(self, N):
 
         # Load the map dictionary. The dictionary maps the characters in the map file to the corresponding agent.
@@ -19,7 +13,7 @@ class CityModel(Model):
 
         self.traffic_lights = []
 
-        # self.total_cars = 0
+        self.total_cars = 0
 
         # Load the map file. The map file is a text file where each character represents an agent.
         with open('city_files/mod2022_base.txt') as baseFile:
@@ -31,7 +25,7 @@ class CityModel(Model):
             self.schedule = RandomActivation(self)
 
             # Add cars
-            self.add_cars(N)
+            # self.add_cars(N)
             
             # Goes through each character in the map file and creates the corresponding agent.
             for r, row in enumerate(lines):
@@ -58,11 +52,13 @@ class CityModel(Model):
         self.running = True
 
     def add_cars(self, N):
-        for i in range(N):
-            car_agent = Car(i, self)
+        corner = ([(0,0), (0, self.height-1), (self.width-1, 0), (self.width-1, self.height-1)])
+        
+        for corner in corner:
+            car_agent = Car(self.total_cars + 1, self, corner)
+            self.grid.place_agent(car_agent, corner)
             self.schedule.add(car_agent)
-            
-            corner = random.choice([(0,0), (0, self.height-1), (self.width-1, 0), (self.width-1, self.height-1)])
+            self.total_cars += 1
             
             road_agent = self.grid.get_cell_list_contents([corner])
             road_agent = next ((agent for agent in road_agent if isinstance(agent, Road)), None)
@@ -71,7 +67,6 @@ class CityModel(Model):
                 car_agent.direction = road_agent.direction
                 # agent.move()
         
-            self.grid.place_agent(car_agent, corner)
     
     def assign_random_destination(self):
         cars = [agent for agent in self.schedule.agents if isinstance(agent, Car)]
@@ -87,3 +82,6 @@ class CityModel(Model):
         cars = [agent for agent in self.schedule.agents if isinstance(agent, Car)]
         for car in cars:
             car.move_towards_destination()
+            
+        if (self.schedule.steps - 1) % 10 == 0:
+            self.add_cars(4)

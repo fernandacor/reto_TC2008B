@@ -7,7 +7,7 @@ class Car(Agent):
         unique_id: Agent's ID 
         direction: Randomly chosen direction chosen from one of eight directions
     """
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, start_pos):
         """
         Creates a new random agent.
         Args:

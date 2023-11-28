@@ -18,6 +18,8 @@ class Car(Agent):
         self.direction = "Right" # default
         self.destination = None
         
+        self.stepsTaken = 0
+        
         # self.destination = destination;
         # self.path = None
         
@@ -32,8 +34,11 @@ class Car(Agent):
         
         if any(isinstance(agent, Road) for agent in current_cell):
             self.move_Road()
+            self.stepsTaken += 1
+
         elif any(isinstance(agent, Traffic_Light) for agent in current_cell):
             self.move_Traffic_Light()
+            self.stepsTaken += 1
 
     def move_towards_destination(self):
         if self.destination:
@@ -42,9 +47,9 @@ class Car(Agent):
             self.color = "pink"
         
     def move_Road(self):
-        x, y = self.pos
+        x, y = self.pos    
         
-        current_cell = self.model.grid.get_cell_list_contents([(x, y)])
+        current_cell = self.model.grid.get_cell_list_contents([(x, y)])    
         
         if any(isinstance(agent, Road) for agent in current_cell):
             road_agent = next (agent for agent in current_cell if isinstance(agent, Road))
@@ -64,20 +69,12 @@ class Car(Agent):
             elif road_agent.direction == "Down-Right":
                 self.model.grid.move_agent(self, (x+1, y-1))
             elif road_agent.direction == "Down-Left":
-                self.model.grid.move_agent(self, (x-1, y-1))
-            # elif road_agent.direction == "Up-Right":
-            #     self.model.grid.move_agent(self, ((x+1, y) or (x, y+1)))
-            # elif road_agent.direction == "Up-Left":
-            #     self.model.grid.move_agent(self, ((x-1, y) or (x, y+1)))
-            # elif road_agent.direction == "Down-Right":
-            #     self.model.grid.move_agent(self, ((x+1, y) or (x, y-1)))
-            # elif road_agent.direction == "Down-Left":
-            #     self.model.grid.move_agent(self, ((x-1, y) or (x, y-1)))
-                
+                self.model.grid.move_agent(self, (x-1, y-1)) 
+                           
     def move_Traffic_Light(self):
-        x, y = self.pos
-        
-        current_cell = self.model.grid.get_cell_list_contents([(x, y)])
+        x, y = self.pos 
+           
+        current_cell = self.model.grid.get_cell_list_contents([(x, y)])    
         
         if any(isinstance(agent, Traffic_Light) for agent in current_cell):
             traffic_light_agent = next (agent for agent in current_cell if isinstance(agent, Traffic_Light))

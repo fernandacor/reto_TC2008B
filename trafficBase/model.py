@@ -31,7 +31,7 @@ class CityModel(Model):
             self.schedule = RandomActivation(self)
 
             # Llamar a la función para añadir coches
-            self.add_cars(N)
+            # self.add_cars(N)
             
             # Itera sobre el mapa base y crea los agentes correspondientes
             for r, row in enumerate(lines):

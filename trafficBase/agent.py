@@ -1,5 +1,6 @@
 from mesa import Agent
 
+
 class Car(Agent):
     """
     Agent that moves randomly.
@@ -15,14 +16,18 @@ class Car(Agent):
             model: Model reference for the agent
         """
         super().__init__(unique_id, model)
+        
         self.direction = "Right" # default
         self.destination = None
-        
         self.stepsTaken = 0
+        self.start = start_pos
         
-        # self.destination = destination;
+        # Nuevo
+        # self.destination = destination
         # self.path = None
-        
+    
+    def getPath(self):
+        self.path = self.find_path
 
     def move(self):
         """ 

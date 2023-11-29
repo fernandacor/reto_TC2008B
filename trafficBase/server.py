@@ -49,7 +49,7 @@ width = 0
 height = 0
 
 # Abrir y leer el archivo con el mapa base
-with open('city_files/2023_base.txt') as baseFile:
+with open('city_files/mod2022_base.txt') as baseFile:
     lines = baseFile.readlines()
     width = len(lines[0])-1
     height = len(lines)

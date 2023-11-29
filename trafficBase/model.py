@@ -13,6 +13,18 @@ class CityModel(Model):
         self.traffic_lights = []
         self.destination = []
         self.G = nx.Graph()
+        self.schedule = RandomActivation(self)
+
+         # Iterate over all agents and add them to the graph
+        for agent in self.schedule.agents:
+            self.G.add_node(agent)
+
+            # Define relationships between different types of agents
+        for agent in self.schedule.agents:
+            if isinstance(agent, Car):
+                # Example: Connect car agents to their destinations
+                destination = agent.destination
+                self.G.add_edge(agent, destination)
 
         with open(mapFile) as baseFile:
             lines = baseFile.readlines()

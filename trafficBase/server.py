@@ -55,7 +55,7 @@ with open('city_files/2023_base.txt') as baseFile:
     height = len(lines)
 
 # Definición de los parametros del modelo
-model_params = {"N":0} # N = número de coches
+model_params = {"N":0, "mapFile":"city_files/2023_base.txt"} # N = número de coches
 
 # Imprimir altura y ancho del grid
 print("W: ", width, ", H: ", height)

@@ -37,26 +37,118 @@ class Car(Agent):
         
     def move_Road(self):
         x, y = self.pos    
-        current_cell = self.model.grid.get_cell_list_contents([(x, y)])    
-        
-        if any(isinstance(agent, Road) for agent in current_cell):
-            road_agent = next (agent for agent in current_cell if isinstance(agent, Road))
+        # current_cell = self.model.grid.get_cell_list_contents([(x, y)]) 
+        road_agents = [agent for agent in self.model.grid.get_cell_list_contents([(x, y)]) if isinstance(agent, Road)]  
+
+        if road_agents:
+            road_agent = road_agents[0]
+            self.direction = road_agent.direction
+            next_position = self.calculate_next_position()
             
-            if self.check_distance_to_cars():
-                self.direction = road_agent.direction
-                self.model.grid.move_agent(self, self.calculate_next_position())
-                self.stepsTaken += 1
+        # Check if the next cell has a Car agent
+        next_cell_contents = self.model.grid.get_cell_list_contents([next_position])
+        has_car = any(isinstance(agent, Car) for agent in next_cell_contents)
+        
+        if not has_car:
+            # Move the agent if the next cell is empty or contains a car
+            self.model.grid.move_agent(self, next_position)
+        
+        # if any(isinstance(agent, Road) for agent in current_cell):
+        #     road_agent = next (agent for agent in current_cell if isinstance(agent, Road))
+            # self.direction = road_agent.direction
+            # self.model.grid.move_agent(self, self.calculate_next_position())
+            # self.stepsTaken += 1
+            
+            # # Check if the next cell has a Car agent
+            # next_cell_contents = self.model.grid.get_cell_list_contents([(next_x, next_y)])
+            # has_car = any(isinstance(agent, Car) for agent in next_cell_contents)
+
+            # if not has_car:
+            #     # Move the agent if the next cell is empty or contains a Road and no Car is present
+            #     self.model.grid.move_agent(self, self.calculate_next_position())
+
+    # def calculate_next_position(self):
+    #     x, y = self.pos
+    #     next_x, next_y = x, y
+        
+    #     if self.direction == "Right":
+    #         next_x, next_y = x + 1, y
+    #     elif self.direction == "Left":
+    #         next_x, next_y = x - 1, y
+    #     elif self.direction == "Up":
+    #         next_x, next_y = x, y + 1
+    #     elif self.direction == "Down":
+    #         next_x, next_y = x, y - 1
+    #     elif self.direction == "Up-Right":
+    #         next_x, next_y = x + 1, y + 1
+    #     elif self.direction == "Up-Left":
+    #         next_x, next_y = x - 1, y + 1
+    #     elif self.direction == "Down-Right":
+    #         next_x, next_y = x + 1, y - 1
+    #     elif self.direction == "Down-Left":
+    #         next_x, next_y = x - 1, y - 1
+            
+    #     return next_x, next_y     
     
-    def calculate_distance(self, pos1, pos2):
-        x1, y1 = pos1
-        x2, y2 = pos2
-        distance = ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
-        return distance
+    def calculate_next_position(self):
+        x, y = self.pos
+        directions = {
+            "Right": (x + 1, y),
+            "Left": (x - 1, y),
+            "Up": (x, y + 1),
+            "Down": (x, y - 1),
+            "Up-Right": (x + 1, y + 1),
+            "Up-Left": (x - 1, y + 1),
+            "Down-Right": (x + 1, y - 1),
+            "Down-Left": (x - 1, y - 1)
+        }  
+        return directions[self.direction]
+                      
+    def move_Traffic_Light(self):
+        x, y = self.pos  
+        # current_cell = self.model.grid.get_cell_list_contents([(x, y)]) 
+        traffic_light_agents = [agent for agent in self.model.grid.get_cell_list_contents([(x, y)]) if isinstance(agent, Traffic_Light)]
+        
+        if traffic_light_agents:
+            traffic_light_agent = traffic_light_agents[0]
+            
+            if traffic_light_agent.state and self.check_distance_to_cars():
+                next_position = self.calculate_next_position()
+                self.model.grid.move_agent(self, next_position)
+                self.stepsTaken += 1
+            # else:
+            #     # Wait for the light to turn green
+            #     pass
+        # if any(isinstance(agent, Traffic_Light) for agent in current_cell):
+        #     traffic_light_agent = next (agent for agent in current_cell if isinstance(agent, Traffic_Light))
+            
+        #     if traffic_light_agent.state and self.check_distance_to_cars():
+        #         next_position = self.calculate_next_position()
+        #         self.model.grid.move_agent(self, next_position)
+        #         self.stepsTaken += 1        
+        #     else: 
+        #         # Wait for the light to turn green
+        #         pass
     
     def check_distance_to_cars(self):
         x, y = self.pos
         neighbors = self.model.grid.get_neighbors((x, y), moore=True, include_center=False)
-        
+
+        for neighbor in neighbors:
+            if isinstance(neighbor, Car):
+                min_distance = 2  # Adjust as needed
+                if self.calculate_distance(self.pos, neighbor.pos) < min_distance:
+                    return False
+            elif isinstance(neighbor, Traffic_Light) and not neighbor.state:
+                min_distance = 1  # Adjust as needed
+                if self.calculate_distance(self.pos, neighbor.pos) < min_distance:
+                    return False
+        return True
+
+    def check_distance_to_cars(self):
+        x, y = self.pos
+        neighbors = self.model.grid.get_neighbors((x, y), moore=True, include_center=False)
+
         for neighbor in neighbors:
             if isinstance(neighbor, Car):
                 min_distance = 2
@@ -66,50 +158,12 @@ class Car(Agent):
                 min_distance = 1
                 if self.calculate_distance(self.pos, neighbor.pos) < min_distance:
                     return False
-        return True
-                
-    def calculate_next_position(self):  
-        x, y = self.pos           
-        if self.direction == "Right":
-            # self.model.grid.move_agent(self, (x+1, y))
-            return x+1, y
-        elif self.direction == "Left":
-            # self.model.grid.move_agent(self, (x-1, y))
-            return x-1, y
-        elif self.direction == "Up":
-            # self.model.grid.move_agent(self, (x, y+1))
-            return x, y+1
-        elif self.direction == "Down":
-            # self.model.grid.move_agent(self, (x, y-1))
-            return x, y-1
-        elif self.direction == "Up-Right":
-            # self.model.grid.move_agent(self, (x+1, y+1))
-            return x+1, y+1
-        elif self.direction == "Up-Left":
-            # self.model.grid.move_agent(self, (x-1, y+1))
-            return x-1, y+1
-        elif self.direction == "Down-Right":
-            # self.model.grid.move_agent(self, (x+1, y-1))
-            return x+1, y-1
-        elif self.direction == "Down-Left":
-            # self.model.grid.move_agent(self, (x-1, y-1)) 
-            return x-1, y-1
-                         
-    def move_Traffic_Light(self):
-        x, y = self.pos  
-        current_cell = self.model.grid.get_cell_list_contents([(x, y)])    
-        
-        if any(isinstance(agent, Traffic_Light) for agent in current_cell):
-            traffic_light_agent = next (agent for agent in current_cell if isinstance(agent, Traffic_Light))
-            
-            if traffic_light_agent.state and self.check_distance_to_cars():
-                next_position = self.calculate_next_position()
-                self.model.grid.move_agent(self, next_position)
-                self.stepsTaken += 1        
-            else: 
-                # Wait for the light to turn green
-                pass
-    
+
+    def calculate_distance(self, pos_1, pos_2):
+        x1, y1 = pos_1
+        x2, y2 = pos_2
+        return ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+                    
     # Función que determina la nueva dirección que el agente tomará, y avanza 
     def step(self):
         self.move()

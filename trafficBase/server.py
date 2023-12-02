@@ -1,8 +1,7 @@
 from agent import *
 from model import CityModel
-from mesa.visualization import CanvasGrid, BarChartModule
+from mesa.visualization import CanvasGrid
 from mesa.visualization import ModularServer
-import random
 
 # Función para definir como se va a mostrar cada agente
 def agent_portrayal(agent):
@@ -49,7 +48,7 @@ width = 0
 height = 0
 
 # Abrir y leer el archivo con el mapa base
-with open('city_files/mod2022_base.txt') as baseFile:
+with open('city_files/2023_base.txt') as baseFile:
     lines = baseFile.readlines()
     width = len(lines[0])-1
     height = len(lines)
@@ -63,13 +62,8 @@ print("W: ", width, ", H: ", height)
 # Definición de la visualización
 grid = CanvasGrid(agent_portrayal, width, height, 500, 500)
 
-# Gráfica para mostrar la cantidad de agentes que hay en el modelo
-bar_chart = BarChartModule (
-    [{"Label": "Cars", "Color": "black"}],
-    scope = "agent", sorting = "ascending", sort_by = "Steps")
-
 # Definición del servidor
 server = ModularServer(CityModel, [grid], "Traffic Base", model_params)
                        
-server.port = 8522 # The default
+server.port = 8529 # The default
 server.launch()
